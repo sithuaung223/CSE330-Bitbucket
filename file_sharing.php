@@ -33,7 +33,7 @@
 	/*login button to check valid user*/
 	if (isset($_POST['login'])){
 		ini_set('auto_detect_line_endings', true);
-		$h = fopen("users.txt", "r");
+		$h = fopen("/home/sithuaung/users.txt", "r");
 		$linenum = 1;
 		echo "<ul>\n";
 
