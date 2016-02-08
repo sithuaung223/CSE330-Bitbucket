@@ -19,8 +19,9 @@
 		echo "Invalid username";
 		exit;
 	}
-	 
-	if($button == "download"){
+
+	//View button is clicked 
+	if($button == "View"){
 		$full_path = sprintf("/home/sithuaung/uploads/%s/%s", $username, $filename);
 		 
 		// Now we need to get the MIME type (e.g., image/jpeg).  PHP provides a neat little interface to do this called finfo.
@@ -31,8 +32,10 @@
 		header("Content-Type: ".$mime);
 		readfile($full_path);
 	}
+	//delete button is clicked 
 	elseif ($button == "delete"){
 		$full_path = sprintf("/home/sithuaung/uploads/%s/%s", $username, $filename);
-		echo unlink($full_path);
+		unlink($full_path);
+		header("LOCATION: profile.php");
 	}
 ?>
