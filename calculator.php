@@ -7,9 +7,9 @@
 <body>
 <form  method="post">
 	<label> First Number</label>
-	<input type="int" name="first_num" /><br><br>	
+	<input type="number" name="first_num" /><br><br>	
 	<label>Second Number</label>
-	<input type="int" name="second_num" /><br>
+	<input type="number" name="second_num" /><br>
 	<input type="radio" name="operator" value="add"/> Addition <br>
 	<input type="radio" name="operator" value="sub"/> Substraction <br>
 	<input type="radio" name="operator" value="mul"/> Multiplication <br>
