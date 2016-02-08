@@ -49,7 +49,7 @@
 <br>
 
 <!--users' file list-->
-<h2>Files List</h2>
+<h2>File List</h2>
 <hr>
 <form action="downloader.php" method="post">
 <?php
