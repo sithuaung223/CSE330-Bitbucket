@@ -5,35 +5,40 @@
 </head>
 <body>
 
+<form action="home.php" method="post">
+	<div class= "logout_btn">
+		<input type="submit" name="logout_btn" value="Log Out"/>
+	</div>
+</form>
 <?php
 require "database.php";
 session_start();
 	if(isset($_POST['button'])){
 		$button= $_POST['button'];
 
-		//Delete
+		//Delete Post
 		if ($button== "Delete"){
 		 $post_id= $_POST['stories'];
 		 $stmt= $mysqli->prepare("delete from posts where post_id=?");
+
 			if(!$stmt){
 				printf("Query Prep Failed: %s\n", $mysqli->error);
 				exit;
 			}
-			 
+
 			$stmt->bind_param('i', $post_id);
-			 
 			$stmt->execute();
 			$stmt->close();
 			header("Location: profile.php");
 		}
 
-		//View
+		//View Post
 		if ($button== "View"){
 		 $post_id= $_POST['stories'];
 		 $_SESSION['post_id'] = $post_id;
 		}
 
-		//Comment
+		//Comment Post
 		if ($button== "Comment"){
 			$post_id = $_SESSION['post_id'];
 			$comment= $_POST['comment'];
@@ -46,7 +51,6 @@ session_start();
 
 			$stmt->bind_param('is', $post_id, $comment);
 			$stmt->execute();
-
 			$stmt->close();
 			header("Location: posts.php");
 		}
@@ -59,9 +63,7 @@ session_start();
   	}
   	 
 	$stmt->bind_param('i', $post_id);
-	 
 	$stmt->execute();
-	 
 	$stmt->bind_result($post_title, $post);
 	 
 	while ($stmt->fetch()){
@@ -72,7 +74,7 @@ session_start();
  	$stmt->close();
 
 ?>
-<form action="edit_delete.php" method="posts">
+<form  action="edit_delete.php" method="post">
 <?php
 	$post_id= $_SESSION['post_id'];
 	$stmt= $mysqli->prepare("select comment,comment_id from comments where post_id=?");
@@ -88,7 +90,7 @@ session_start();
 	$stmt->bind_result($comment, $comment_id);
 
 	while($stmt-> fetch()){
-		echo '<input type="radio" name="stories" value="';
+		echo '<input type="radio" name="comment_id" value="';
 		echo $comment_id;
 		echo '"/>';
 		printf("\t%s\n<br>",
@@ -97,9 +99,10 @@ session_start();
 	}
 
 	$stmt->close();
+
 ?>
-	<input type="submit" name="button" value="Edit"/>
-	<input type="submit" name="button" value="Delete"/>
+	<input type="submit" name="button" value="Edit Comment"/>
+	<input type="submit" name="button" value="Delete Comment"/>
 </form>
 
 <form  method="post">
