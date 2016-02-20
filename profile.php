@@ -2,6 +2,11 @@
 <html>
 <head>
 	<style type='text/css'>
+		#story{
+			height: 50px;
+			width: 500px;
+		}
+
 		div.logout_btn{
 			text-align: right;
 		}
@@ -15,35 +20,41 @@
 		</div>
 	</form>
 
-	<form method="post">
-		<label> Story Title: </label>
-			<input type="text" name="title"/>
-			<input type="submit" name="submit_story" value="Submit"/><br>
+	<form action="write_post.php" method="post">
+			<input type="submit" value="Wirte a Story"/><br>
 	</form>
-		<label> About: </label>
-			<textarea method="post" name="post" rows="4" cols="100"></textarea><br>
 <!--php-->
+<form action="posts.php" method="post">
 <?php
   require 'database.php';
   session_start();
-	if(isset($_POST['submit_story'])){
-
-		$user_id= $_SESSION['user_id'];
-		$post= $_POST['title'];
-		$stmt= $mysqli->prepare("insert into posts (user_id, post) values (?, ?)");
-		if (!$stmt){
-			printf("Query Prep Failed: %s\n", $mysqli->error);
-			exit;
-		}
-
-		$stmt->bind_param('is', $user_id, $post);
-
-		$stmt->execute();
-
-		$stmt->close();
-		header("Location: profile.php");
+	$user_id= $_SESSION['user_id'];
+	$stmt= $mysqli->prepare("select post_id, post_title from posts where user_id=?");
+	if(!$stmt){
+		printf("Query Prep Failed: %s\n", $mysqli->error);
+		exit;
 	}
+	 
+	$stmt->bind_param('i', $user_id);
+	 
+	$stmt->execute();
+	 
+	$stmt->bind_result($post_id, $post_title);
+	 
+	while($stmt-> fetch()){
+    echo '<input type="radio" name="stories" value="'; 
+    echo $post_id; 
+    echo '"/>'; 
+		printf("\t%s\n<br>",
+			htmlspecialchars($post_title)
+		);
+	}
+	 
+	$stmt->close();
 ?>
+ <input type="submit" name="button" value="View"/>
+ <input type="submit" name="button" value="Delete"/>
+</form>
 
 </body>
 	
