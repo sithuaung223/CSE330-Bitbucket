@@ -5,21 +5,34 @@
 </head>
 <body>
 
-<form action="home.php" method="post">
-	<div class= "logout_btn">
-		<input type="submit" name="logout_btn" value="Log Out"/>
-	</div>
+<form action="profile.php" method="post">
+		<input type="submit" value="Back "/>
 </form>
 <?php
 require "database.php";
 session_start();
 	if(isset($_POST['button'])){
 		$button= $_POST['button'];
-
+		//Edit Post
+		if ($button== "Edit Post"){
+			header("Location: edit_post.php");
+		}
 		//Delete Post
-		if ($button== "Delete"){
-		 $post_id= $_POST['stories'];
-		 $stmt= $mysqli->prepare("delete from posts where post_id=?");
+		if ($button== "Delete" || $button== "Delete Post"){
+		 $post_id= $_SESSION['post_id'];
+		 //delete the comments related to post
+		 $stmt= $mysqli->prepare("delete from comments where post_id=?");
+
+			if(!$stmt){
+				printf("Query Prep Failed: %s\n", $mysqli->error);
+				exit;
+			}
+
+			$stmt->bind_param('i', $post_id);
+			$stmt->execute();
+			$stmt->close();
+			//delete the post
+			$stmt= $mysqli->prepare("delete from posts where post_id=?");
 
 			if(!$stmt){
 				printf("Query Prep Failed: %s\n", $mysqli->error);
@@ -34,8 +47,6 @@ session_start();
 
 		//View Post
 		if ($button== "View"){
-		 $post_id= $_POST['stories'];
-		 $_SESSION['post_id'] = $post_id;
 		}
 
 		//Comment Post
@@ -74,7 +85,12 @@ session_start();
  	$stmt->close();
 
 ?>
-<form  action="edit_delete.php" method="post">
+<form method="post">
+		<input type="submit" name="button" value="Edit Post"/>
+		<input type="submit" name="button" value="Delete Post"/>
+</form>
+<hr>
+<form  action="edit_delete_comment.php" method="post">
 <?php
 	$post_id= $_SESSION['post_id'];
 	$stmt= $mysqli->prepare("select comment,comment_id from comments where post_id=?");
@@ -101,12 +117,15 @@ session_start();
 	$stmt->close();
 
 ?>
+	<br>
 	<input type="submit" name="button" value="Edit Comment"/>
 	<input type="submit" name="button" value="Delete Comment"/>
 </form>
+<br>
+<br>
 
 <form  method="post">
-	<label> Your Comment</label>
+	<label> Your Comment:</label>
 		<input type="text" name="comment"/>
 		<input type="submit" name="button" value="Comment"/>
 </form>

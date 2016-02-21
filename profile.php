@@ -13,18 +13,18 @@
 	</style>
 </head>
 <body>
-	<h1>Profile </h1>
 	<form action="home.php" method="post">
 		<div class= "logout_btn">
 			<input type="submit" name="logout_btn" value="Log Out"/>
 		</div>
 	</form>
-
+	<h1>Posts </h1>
+<hr><br>
 	<form action="write_post.php" method="post">
-			<input type="submit" value="Wirte a Story"/><br>
+		<input type="submit" value="Wirte a Story"/><br><br>
 	</form>
 <!--php-->
-<form action="posts.php" method="post">
+<form method="post">
 <?php
   require 'database.php';
   session_start();
@@ -51,9 +51,15 @@
 	}
 	 
 	$stmt->close();
+	if(isset($_POST['button'])){
+		$_SESSION['post_id']= $_POST['stories'];
+		header("Location: posts.php");
+	}
+
 ?>
- <input type="submit" name="button" value="View"/>
- <input type="submit" name="button" value="Delete"/>
+	<br>
+  <input type="submit" name="button" value="View"/>
+  <input type="submit" name="button" value="Delete"/>
 </form>
 
 </body>

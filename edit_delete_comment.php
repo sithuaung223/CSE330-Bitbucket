@@ -27,6 +27,7 @@
 	//update;
   if (isset($_POST['update'])){
 
+		$comment_id= $_SESSION['comment_id'];
     $comment= $_POST['comment'];
     $stmt= $mysqli->prepare("update comments set comment=?  where comment_id=?");
     if (!$stmt){
@@ -48,6 +49,7 @@
 	// Edit and Delete comment from posts.php
     if (isset($_POST['button'])){
 			$_SESSION['comment_id']= (int)$_POST['comment_id'];
+			$comment_id= $_SESSION['comment_id'];
       $button= $_POST['button'];
       if ($button== "Edit Comment"){
       }

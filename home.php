@@ -25,16 +25,16 @@ session_start();
 	
 /*register*/
 	if (isset ($_POST ['register'])){
-		header("Location: insert.php");
 		$_SESSION['username']= $_POST['username'];
 		$_SESSION['password']= $_POST['password'];
 		$_SESSION['email']= $_POST['email'];
+		header("Location: insert.php");
 	}
 /*login*/
 	if (isset ($_POST ['login'])){
-		header("Location: select.php");
 		$_SESSION['username']= $_POST['username'];
 		$_SESSION['password']= $_POST['password'];
+		header("Location: select.php");
 	}
 ?>
 <h1> Welcome To Facebook!</h1>
