@@ -22,10 +22,10 @@
 <?php
   require 'database.php';
   session_start();
+		// if(($_SESSION['token']-$_POST['token'])!=0){ 
+					//die("Request forgery detected");
+		//		}
 	if(isset($_SESSION['user_id'])){
-		 if(($_SESSION['token']-$_POST['token'])!=0){ 
-					die("Request forgery detected");
-				}
 		echo'<form action="profile.php">';
 		echo'<input type="submit" value="My Profile"/>';
 		echo'</form>';
