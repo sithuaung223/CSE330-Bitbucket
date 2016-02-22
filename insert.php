@@ -17,5 +17,5 @@
 	$stmt->execute();
 	 
 	$stmt->close();
-	header("Location: profile.php");
+	header("Location: select.php");
 ?>

@@ -2,6 +2,12 @@
 <html>
 <head>
 		<title>Post</title>
+		<style>
+			img{
+				width: 300px;
+				height: 300px;
+			}
+		</style>
 </head>
 <body>
 
@@ -17,6 +23,20 @@ session_start();
 		if ($button== "Edit Post"){
 			header("Location: edit_post.php");
 		}
+		//Upvote
+		if ($button== "Upvote Post"){
+			$post_id = $_SESSION['post_id'];
+			$stmt= $mysqli->prepare("update votes set upvote=upvote+1 where post_id=?");
+				if(!$stmt){
+					printf("Query Prep Failed: %s\n", $mysqli->error);
+					exit;
+				}
+				 
+			$stmt->bind_param('i', $post_id);
+			$stmt->execute();
+			$stmt->close();
+		}
+
 		//Delete Post
 		if ($button== "Delete" || $button== "Delete Post"){
 		 $post_id= $_SESSION['post_id'];
@@ -67,7 +87,7 @@ session_start();
 		}
 	}
   $post_id = $_SESSION['post_id'];
-  $stmt= $mysqli->prepare("select post_title,post from posts where post_id=?");
+  $stmt= $mysqli->prepare("select post_title,post,upvote,img_link from posts where post_id=?");
   	if(!$stmt){
   		printf("Query Prep Failed: %s\n", $mysqli->error);
   		exit;
@@ -75,16 +95,19 @@ session_start();
   	 
 	$stmt->bind_param('i', $post_id);
 	$stmt->execute();
-	$stmt->bind_result($post_title, $post);
+	$stmt->bind_result($post_title, $post, $upvote,$img_link);
 	 
 	while ($stmt->fetch()){
 		echo "<h1>".$post_title."</h1>";
 		echo "<p>".$post."</p>";
+		echo '<img src="'.$img_link.'" alt="image"><br>'; 
+		echo "<p1> Upvote : ".$upvote."</p1>";
 	}
 
  	$stmt->close();
 	if(isset($_SESSION['user_id'])){
 		echo '<form method="post">';
+		echo '<input type="submit" name="upvote" value="Upvote Post"/><br><br>';
 		echo '<input type="submit" name="button" value="Edit Post"/>';
 		echo '<input type="submit" name="button" value="Delete Post"/>';
 		echo '</form>';

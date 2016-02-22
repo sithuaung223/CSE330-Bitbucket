@@ -10,13 +10,14 @@
 		$upvote= 0;
 		$_SESSION['hlink']= $_POST['story_link'];
 		$hlink= $_SESSION['hlink'];
-    $stmt= $mysqli->prepare("insert into posts (user_id, post_title, post, upvote, hlink) values (?, ?, ?, ?, ?)");
+		$img_link= $_POST['img_link'];
+    $stmt= $mysqli->prepare("insert into posts (user_id, post_title, post, upvote, hlink, img_link) values (?, ?, ?, ?, ?, ?)");
     if (!$stmt){
       printf("Query Prep Failed: %s\n", $mysqli->error);
       exit;
     }
 
-    $stmt->bind_param('issis', $user_id, $post_title, $post,$upvote, $hlink);
+    $stmt->bind_param('ississ', $user_id, $post_title, $post,$upvote, $hlink, $img_link);
 
     $stmt->execute();
 
@@ -51,6 +52,8 @@
       <input type="text"  name="story_title"/><br>
     <label> Link: </label>
       <input type="text"  name="story_link"/><br>
+    <label>Image Link: </label>
+      <input type="text"  name="img_link"/><br>
     <label> About: </label>
       <input type="text"  id="story" name="story"/><br>
       <input type="submit" name="submit_story" value="Submit"/><br>
