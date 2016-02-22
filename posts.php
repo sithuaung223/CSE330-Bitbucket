@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 		<title>Post</title>
-		<style>
+	 <style type= "text/css">
+			body{
+				background: #55B14A;
+				color: white;
+			}
 			img{
 				width: 50%;
 				height: 50%;
@@ -10,14 +15,20 @@
 			p{
 				font-size: 24px;
 			}
+			h1{
+				text-align: center;
+			}
 		</style>
 </head>
 <body>
-
-
 <?php
 require "database.php";
 session_start();
+  if(($_SESSION['token']-$_POST['token'])!=0){
+      echo  $_SESSION['token'];
+      echo  $_POST['token'];
+      die("Request forgery detected");
+    }
 	if(isset($_SESSION['user_id'])){
 		echo '<form action="profile.php" method="post">';
 		echo '<input type="submit" value="My Profile "/>';
@@ -111,10 +122,10 @@ session_start();
 	 
 	while ($stmt->fetch()){
 		echo "<h1><ins>".$post_title."<ins></h1>";
-		echo "<p>".$post."</p>";
 		if($img_link){
 			echo '<img src="'.$img_link.'" alt="image"><br>'; 
 		}
+		echo "<p>".$post."</p>";
 		echo "<p1><b> Upvote :</b> ".$upvote."</p1>";
 	}
 	if($poster_id== $_SESSION['user_id']){
@@ -190,7 +201,7 @@ session_start();
 	}
 
 ?>
-
+</form>
 </body>
 </html>
 

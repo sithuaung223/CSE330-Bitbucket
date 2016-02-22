@@ -1,15 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
+	<title>Edit Post</title>
   <style type='text/css'>
+    body{
+      background: #55B14A;
+      color: white;
+    }
     #story{
       height: 50px;
       width: 500px;
     }
+		h1{
+      text-align: center;
+		}
   </style>
 </head>
 <body>
-  <h1>Story </h1>
+  <h1><ins>Story </ins></h1>
   <form method="post">
     <label> Story Title: </label>
       <input type="text"  name="story_title"/><br>

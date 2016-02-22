@@ -1,7 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<style type='text/css'>
+	<meta charset="UTF-8">
+	<title> Profile</title>
+	<style type= "text/css">
+    body{
+      background: #55B14A;
+      color: white;
+    }
+		h1{
+      text-align: center;
+		}
 		#story{
 			height: 50px;
 			width: 500px;
@@ -19,6 +28,11 @@
 <h1>Profile</h1>
 	<form action="main.php" method="post">
 			<input type="submit" name="main_page_btn" value="Main Page"/>
+			 <input type="hidden" name="token" value="
+					<?php 
+						echo $_SESSION['token'];
+					?>" />
+
 	</form>
 <hr>
 <p>My Posts </p>

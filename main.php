@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="UTF-8">
 	<title>Main Page</title>
-  <style type='text/css'>
+	 <style type= "text/css">
+    body{
+      background: #55B14A;
+      color: white;
+    }
     #btn{
 			text-align: right;
     }
+		h1{
+			text-align: center;
+		}
 	</style>
 
 </head>
@@ -15,6 +23,9 @@
   require 'database.php';
   session_start();
 	if(isset($_SESSION['user_id'])){
+		 if(($_SESSION['token']-$_POST['token'])!=0){ 
+					die("Request forgery detected");
+				}
 		echo'<form action="profile.php">';
 		echo'<input type="submit" value="My Profile"/>';
 		echo'</form>';

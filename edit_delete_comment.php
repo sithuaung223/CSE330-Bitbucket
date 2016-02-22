@@ -1,7 +1,16 @@
 <!DOCTYPE html> 
 <html>
 <head>
+	<meta charset="UTF-8">
+	<title> Edit_comment</title>
   <style type='text/css'>
+    body{
+      background: #55B14A;
+      color: white;
+    }
+    h1{
+      text-align: center;
+    }
     #comment{
       height: 50px;
       width: 500px;

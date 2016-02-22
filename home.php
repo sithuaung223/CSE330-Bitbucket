@@ -2,10 +2,10 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>Facebook</title>
+	<title>Saidit</title>
 	<style type= "text/css">
 		body{
-			background: #25383C;
+			background: #55B14A;
 			text-align: center;
 			color: white;
 		}
@@ -34,10 +34,11 @@ session_start();
 	if (isset ($_POST ['login'])){
 		$_SESSION['username']= $_POST['username'];
 		$_SESSION['password']= $_POST['password'];
+		$_SESSION['token'] = substr(md5(rand()), 0, 10); // generate a 10-character random string
 		header("Location: select.php");
 	}
 ?>
-<h1> Welcome To Facebook!</h1>
+<h1> Welcome To Saidit!</h1>
 <!--Rigester form-->
 <form method= "post">
 	<label>Username: </label>

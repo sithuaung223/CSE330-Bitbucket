@@ -1,3 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Write Posts</title>
+	<meta charset="UTF-8">
+  <style type= "text/css">
+    body{
+      background: #55B14A;
+      color: white;
+    }
+
+    #story{
+      height: 50px;
+      width: 500px;
+    }
+
+    div.logout_btn{
+      text-align: right;
+    }
+		h1{
+      text-align: center;
+		}
+  </style>
+</head>
+
+<body>
+  <h1><ins>Story</ins> </h1>
+  <form method="post">
+    <label> Story Title: </label>
+      <input type="text"  name="story_title"/><br>
+    <label> Link: </label>
+      <input type="text"  name="story_link"/><br>
+    <label>Image Link: </label>
+      <input type="text"  name="img_link"/><br>
+    <label> About: </label>
+      <input type="text"  id="story" name="story"/><br>
+      <input type="submit" name="submit_story" value="Submit"/><br>
+      <input type="submit" name="cancel" value="Cancel"/><br>
+		
+  </form>
 <!--php-->
 <?php
   require 'database.php';
@@ -29,35 +69,6 @@
 	}
 ?>
 
-<!DOCTYPE html>
+
 </body>
 </html>
-<html>
-<head>
-  <style type='text/css'>
-    #story{
-      height: 50px;
-      width: 500px;
-    }
-
-    div.logout_btn{
-      text-align: right;
-    }
-  </style>
-</head>
-<body>
-  <h1>Story </h1>
-  <form method="post">
-    <label> Story Title: </label>
-      <input type="text"  name="story_title"/><br>
-    <label> Link: </label>
-      <input type="text"  name="story_link"/><br>
-    <label>Image Link: </label>
-      <input type="text"  name="img_link"/><br>
-    <label> About: </label>
-      <input type="text"  id="story" name="story"/><br>
-      <input type="submit" name="submit_story" value="Submit"/><br>
-      <input type="submit" name="cancel" value="Cancel"/><br>
-		
-  </form>
-
