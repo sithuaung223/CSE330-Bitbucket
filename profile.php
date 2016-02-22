@@ -7,22 +7,21 @@
 			width: 500px;
 		}
 
-		div.logout_btn{
+		#btn{
 			text-align: right;
 		}
 	</style>
 </head>
 <body>
-	<form action="home.php" method="post">
-		<div class= "logout_btn">
+	<form id="btn" action="home.php" method="post">
 			<input type="submit" name="logout_btn" value="Log Out"/>
-		</div>
 	</form>
-	<h1>Posts </h1>
-<hr><br>
-	<form action="write_post.php" method="post">
-		<input type="submit" value="Wirte a Story"/><br><br>
+<h1>Profile</h1>
+	<form action="main.php" method="post">
+			<input type="submit" name="main_page_btn" value="Main Page"/>
 	</form>
+<hr>
+<p>My Posts </p>
 <!--php-->
 <form method="post">
 <?php
@@ -61,9 +60,11 @@
 ?>
 	<br>
   <input type="submit" name="button" value="View"/>
-  <input type="submit" name="button" value="Delete"/>
-</form>
+</form><br><br>
 
+<form action="write_post.php" method="post">
+	<input type="submit" value="Wirte a Story"/>
+</form>
 </body>
 	
 </html>
