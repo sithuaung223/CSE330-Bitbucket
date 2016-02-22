@@ -1,4 +1,36 @@
+<!--php-->
+<?php
+  require 'database.php';
+  session_start();
+  $user_id= $_SESSION['user_id'];
+  if (isset($_POST['submit_story'])){
+
+    $post_title= $_POST['story_title'];
+		$post= $_POST['story'];
+		$upvote= 0;
+		$_SESSION['hlink']= $_POST['story_link'];
+		$hlink= $_SESSION['hlink'];
+    $stmt= $mysqli->prepare("insert into posts (user_id, post_title, post, upvote, hlink) values (?, ?, ?, ?, ?)");
+    if (!$stmt){
+      printf("Query Prep Failed: %s\n", $mysqli->error);
+      exit;
+    }
+
+    $stmt->bind_param('issis', $user_id, $post_title, $post,$upvote, $hlink);
+
+    $stmt->execute();
+
+    $stmt->close();
+    header("Location: profile.php");
+  }
+  if (isset($_POST['cancel'])){
+    header("Location: profile.php");
+	}
+?>
+
 <!DOCTYPE html>
+</body>
+</html>
 <html>
 <head>
   <style type='text/css'>
@@ -17,6 +49,8 @@
   <form method="post">
     <label> Story Title: </label>
       <input type="text"  name="story_title"/><br>
+    <label> Link: </label>
+      <input type="text"  name="story_link"/><br>
     <label> About: </label>
       <input type="text"  id="story" name="story"/><br>
       <input type="submit" name="submit_story" value="Submit"/><br>
@@ -24,31 +58,3 @@
 		
   </form>
 
-<!--php-->
-<?php
-  require 'database.php';
-  session_start();
-  $user_id= $_SESSION['user_id'];
-  if (isset($_POST['submit_story'])){
-
-    $post_title= $_POST['story_title'];
-		$post= $_POST['story'];
-    $stmt= $mysqli->prepare("insert into posts (user_id, post_title, post) values (?, ?, ?)");
-    if (!$stmt){
-      printf("Query Prep Failed: %s\n", $mysqli->error);
-      exit;
-    }
-
-    $stmt->bind_param('iss', $user_id, $post_title, $post);
-
-    $stmt->execute();
-
-    $stmt->close();
-    header("Location: profile.php");
-  }
-  if (isset($_POST['cancel'])){
-    header("Location: profile.php");
-	}
-?>
-</body>
-</html>

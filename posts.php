@@ -83,13 +83,16 @@ session_start();
 	}
 
  	$stmt->close();
+	if(isset($_SESSION['user_id'])){
+		echo '<form method="post">';
+		echo '<input type="submit" name="button" value="Edit Post"/>';
+		echo '<input type="submit" name="button" value="Delete Post"/>';
+		echo '</form>';
+	}
 
 ?>
-<form method="post">
-		<input type="submit" name="button" value="Edit Post"/>
-		<input type="submit" name="button" value="Delete Post"/>
-</form>
 <hr>
+
 <form  action="edit_delete_comment.php" method="post">
 <?php
 	$post_id= $_SESSION['post_id'];
@@ -115,20 +118,22 @@ session_start();
 	}
 
 	$stmt->close();
+	if(isset($_SESSION['user_id'])){
+		echo '<br>';
+		echo '<input type="submit" name="button" value="Edit Comment"/>';
+		echo '<input type="submit" name="button" value="Delete Comment"/>';
+		echo '</form>';
+		echo '<br>';
+	  echo '<br>';
+
+		echo '<form  method="post">';
+		echo '<label> Your Comment:</label>';
+		echo '	<input type="text" name="comment"/>';
+		echo '<input type="submit" name="button" value="Comment"/>';
+		echo '</form>';
+	}
 
 ?>
-	<br>
-	<input type="submit" name="button" value="Edit Comment"/>
-	<input type="submit" name="button" value="Delete Comment"/>
-</form>
-<br>
-<br>
-
-<form  method="post">
-	<label> Your Comment:</label>
-		<input type="text" name="comment"/>
-		<input type="submit" name="button" value="Comment"/>
-</form>
 
 </body>
 </html>
