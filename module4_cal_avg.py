@@ -27,7 +27,7 @@ def inSet (player, my_objects):
 #set of players
 my_objects= set() 
 
-#input file path
+#check arguments and ask for input if necessary
 if (len(sys.argv) <= 1):
     print("No argument for file name/path")
     input_file= raw_input("Enter the input file name/path: ")
