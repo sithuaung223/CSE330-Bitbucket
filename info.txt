@@ -1,0 +1,7 @@
+Name: Si Thu Aung
+ID: 444971
+
+Regular Expression: regex.txt
+Baseball stats counter: module4_cal_avg.py 
+
+moudle4_cal_avg.py will create output file: average_score.txt
