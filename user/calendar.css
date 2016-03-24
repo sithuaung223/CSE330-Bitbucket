@@ -1,0 +1,20 @@
+/*
+	index.css
+
+
+*/
+
+#header{
+		background-color: #151B54;
+		color: white; 
+
+}
+#login,#logout{
+	position: absolute;
+	bottom: 8px;
+	right: 0px;
+	display: none;
+}
+#Lusername, #Lpassword{
+	color: black;
+}
