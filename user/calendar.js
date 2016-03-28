@@ -1,21 +1,13 @@
 // ajax.js
-//check user log in or not
-$( document ).ready(function() {
-	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open("GET", "select.php", true);
-	xmlHttp.addEventListener("load", function(event){
-		var jsonData= JSON.parse(event.target.responseText);
-		if(jsonData.login){
-			$('#logout').show();
-		}
-		else
-		{
-			$('#login').show();
-		}
-	}, false);
-	xmlHttp.send(null);
-});
-
+function checkLogin(login){
+	if(login){
+		$('#logout').show();
+	}
+	else
+	{
+		$('#login').show();
+	}
+}
 //register
 document.getElementById("register_btn").addEventListener("click", function(){
 	window.location.assign('register.html');
@@ -71,4 +63,7 @@ function logoutAjax(event){
 }
 
 document.getElementById("logout_btn").addEventListener("click", logoutAjax, false); // Bind the AJAX call to button click
+
+
+
 

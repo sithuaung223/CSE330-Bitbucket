@@ -40,6 +40,7 @@ session_start();
 			// Login succeeded!
 			$_SESSION['user_id']= $user_id;
 			$_SESSION['username']= $username;
+			$_SESSION['token'] = substr(md5(rand()), 0, 10);
 			echo json_encode(array(
 				"success" => true
 			));

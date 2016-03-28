@@ -1,0 +1,169 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+<head>
+	<title> BEST Calendar NA</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="test.css"> 
+</head>
+<body>
+	<ul class="month">
+		<button id= "prev_month_btn" class="btn btn-warning"> < </button>
+		<p id="month_year"></p>
+		<button id= "next_month_btn" class="btn btn-warning"> > </button>
+	</ul>	
+
+<ul class="weekdays">
+  <li>Sunday</li>
+  <li>Monday</li>
+  <li>Tuesday</li>
+  <li>Wendsday</li>
+  <li>Thursday</li>
+  <li>Friday</li>
+  <li>Saturday</li>
+</ul>
+<ul id="days"> </ul>
+<!-- <form id="token_form" method="post" action="create_event.php">
+  <input type="hidden" name="user_token" value="<?php session_start(); echo  $_SESSION['user_token'];  ?>"></input>
+</form> -->
+</body>
+<script type="text/javascript" src='test.js'>
+	console.log("printed out ttest.js");
+</script>
+<script type="text/javascript">
+
+document.addEventListener("DOMContentLoaded", updateCalendar, false);
+var currentMonth= new Month(2016,2); 
+// Change the month when the "next" button is pressed
+document.getElementById("next_month_btn").addEventListener("click", function(event){
+	currentMonth = currentMonth.nextMonth(); // Previous month would be currentMonth.prevMonth()
+	updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
+	//alert ("The new month is "+currentMonth.month+" "+currentMonth.year);
+}, false);
+document.getElementById("prev_month_btn").addEventListener("click", function(event){
+	currentMonth = currentMonth.prevMonth(); // Previous month would be currentMonth.prevMonth()
+	updateCalendar(); // Whenever the month is updated, we'll need to re-render the calendar in HTML
+	//alert ("The new month is "+currentMonth.month+" "+currentMonth.year);
+}, false);
+ 
+ 
+// This updateCalendar() function only alerts the dates in the currently specified month.  You need to write
+// it to modify the DOM (optionally using jQuery) to display the days and weeks in the current month.
+function updateCalendar(){
+	var weeks = currentMonth.getWeeks();
+ 	var ul= document.getElementById("days");
+	var listOfDays = [];
+	$('#days').empty();
+	for(var w in weeks){
+		var days = weeks[w].getDates();
+		// days contains normal JavaScript Date objects.
+	//	alert("Week starting on "+days[0]);
+		var i=0;
+ 		days.forEach(function(event){
+ 			var dayObj={};
+ 			dayObj['date'] = days[i].getDate();
+ 			dayObj['month'] = days[i].getMonth();
+      dayObj['year'] = days[i].getFullYear();
+ 			dayObj['info'] = days[i].toDateString();
+ 			dayObj['event'] = "event";
+ 			listOfDays.push(dayObj);
+ 			i= i+1;
+ 		});
+ 		for(var d in days){
+			// You can see console.log() output in your JavaScript debugging tool, like Firebug,
+			// WebWit Inspector, or Dragonfly.
+			// console.log(days[d].toISOString());
+			num= w*7 + d*1;
+      var li= document.createElement('li');
+		 	li.innerHTML= days[d].getDate();
+      li.id= "day"+num;
+      ul.appendChild(li);
+      $("#day"+num).data("dayObj", listOfDays[num]);
+		}
+	}
+	console.log(listOfDays);
+	//to print month
+	var num_month = listOfDays[15].month;
+  	var year= listOfDays[15].year;
+   	printMonth(num_month,year);
+    
+   	//click day
+   	document.getElementById("days").addEventListener("click",clickDay,false);
+    viewEvent();
+
+}
+
+function printMonth(num_month,year) {
+    var month = new Array();
+    month[0] = "January";
+    month[1] = "February";
+    month[2] = "March";
+    month[3] = "April";
+    month[4] = "May";
+    month[5] = "June";
+    month[6] = "July";
+    month[7] = "August";
+    month[8] = "September";
+    month[9] = "October";
+    month[10] = "November";
+    month[11] = "December";
+    document.getElementById("month_year").innerHTML = month[num_month]+", "+year;
+}
+
+function clickDay(e){
+  console.log(e.target.nodeName);
+    if(e.target && e.target.nodeName == "LI") {
+      alert(e.target.innerHTML);
+      clickbutton(e.target.innerHTML,e.target.id);
+    }
+}
+function clickbutton(day,id){
+  //console.log("clicked"+ day.getDate());
+  // alert("clicked"+ day.getDate()); // make a month and year
+  var title = prompt("What would you like to call this event");
+  var time = prompt("Please enter the time of event");
+  var category = prompt("Any event categories?");
+  createEvent(id, time, title, category);
+}
+
+function createEvent(date, time, title, category) {
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("POST", "create_event.php", true);
+  xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  
+  xmlHttp.addEventListener("load", function(event){
+    var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
+    if(jsonData.success){  // in PHP, this was the "success" key in the associative array; in JavaScript, it's the .success property of jsonData
+      alert("success");
+    }else{
+      alert("fail");
+    }
+  }, false); // Bind the callback to the load event
+  xmlHttp.send("date=" + date + "&time=" + time + "&title=" + title + "&category=" + category);
+}
+
+function viewEvent(){
+    $("#days").children('li').each(function(){
+      var dayid= this.id;
+      var obj= $(this);
+      var dataString = "dayid=" + encodeURIComponent(dayid);
+     
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.open("POST", "show_event.php", true); 
+      xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      
+      xmlHttp.addEventListener("load", function(event){
+        var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
+        if(jsonData.success){
+          obj.append('<a>'+jsonData.title+'</a>');
+        }
+      }, false); // Bind the callback to the load event
+      xmlHttp.send(dataString); // Send the data
+    });
+}
+
+</script>
+</html>
+
+
