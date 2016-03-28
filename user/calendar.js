@@ -1,4 +1,5 @@
 // ajax.js
+var token;
 function checkLogin(login){
 	if(login){
 		$('#logout').show();
@@ -28,6 +29,8 @@ function loginAjax(event){
 		document.getElementById("Lpassword").value= ""; // clear the password
 		var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
 		if(jsonData.success){  // in PHP, this was the "success" key in the associative array; in JavaScript, it's the .success property of jsonData
+			token= jsonData.token;
+			console.log(token);
 			alert("You've been Logged In!");
 			$('#login').hide();
 			$('#logout').show();

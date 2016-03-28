@@ -1,11 +1,12 @@
 <?php
 require 'database.php';
 header("Content-Type: application/json"); // Since we are sending a JSON response here (not an HTML document), set the MIME Type to application/json
+ini_set("session.cookie_httponly", 1);
 session_start();
 
 /*register*/
-   	$username= $_POST['username'];
-    $pwd= $_POST['password'];
+   	$username= htmlentities($_POST['username']);
+    $pwd= htmlentities($_POST['password']);
 	 
 	$_SESSION['username']= $username;
 	$_SESSION['password']= $pwd;

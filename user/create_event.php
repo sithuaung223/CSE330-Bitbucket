@@ -3,10 +3,12 @@
 create an event
 time is a string
 */
+ini_set("session.cookie_httponly", 1);
 session_start();
 
 // if($_POST['token'] == $_SESSION["token"]){//create a session id when i log in
-if(isset($_SESSION['user_id'])){  
+// if(isset($_SESSION['user_id'])){ 
+if($_POST['token']== $_SESSION['token']){
   header("Content-Type: application/json"); // Since we are sending a JSON response here (not an HTML document), set the MIME Type to application/json
   require 'database.php';
 

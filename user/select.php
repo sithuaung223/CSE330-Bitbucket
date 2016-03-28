@@ -1,6 +1,7 @@
 <?php
 require 'database.php';
 header("Content-Type: application/json"); // Since we are sending a JSON response here (not an HTML document), set the MIME Type to application/json
+ini_set("session.cookie_httponly", 1);
 session_start();
 
 /*logout*/ 
@@ -23,8 +24,8 @@ session_start();
 	}
 /*login*/
 	if (isset($_POST['username'])){ 
-	   $username= $_POST['username'];
-	   $pwd_guess= $_POST['password'];
+	   $username= htmlentities($_POST['username']);
+	   $pwd_guess= htmlentities($_POST['password']);
 	// Use a prepared statement
 		$stmt = $mysqli->prepare("SELECT COUNT(*), user_id, user_pass FROM users WHERE user_name=?");
 		// Bind the parameter
@@ -42,7 +43,8 @@ session_start();
 			$_SESSION['username']= $username;
 			$_SESSION['token'] = substr(md5(rand()), 0, 10);
 			echo json_encode(array(
-				"success" => true
+				"success" => true,
+				"token"=> $_SESSION['token']
 			));
 			exit;
 		}else{

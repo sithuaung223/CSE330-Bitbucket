@@ -64,7 +64,7 @@
     list-style-type: none;
     display: inline-block;
     width: 13.7%;
-    height: 12%;
+    min-height: 70px;
     text-align: center;
     margin-bottom: 15px;
     font-size:20px;
@@ -76,5 +76,8 @@
 #days li:hover{
 	background-color : #C84F4F; 
 }
+
+.year .prev {float: left;}
+.year .next {float: left;}
 
 </style>

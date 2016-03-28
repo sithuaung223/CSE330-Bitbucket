@@ -18,3 +18,7 @@
 #Lusername, #Lpassword{
 	color: black;
 }
+#myFrame{
+	width: 100%;
+	height:800px;
+}

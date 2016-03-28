@@ -1,4 +1,4 @@
-<!DOCTYPE <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 	<title> BEST Calendar NA</title>
@@ -12,7 +12,34 @@
 		<button id= "prev_month_btn" class="btn btn-warning"> < </button>
 		<p id="month_year"></p>
 		<button id= "next_month_btn" class="btn btn-warning"> > </button>
-	</ul>	
+	</ul>
+  <!-- Trigger the modal with a button -->
+  <!-- Modal -->
+  <div id="modal-div">
+    <div id="myModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Modal Header</h4>
+          </div>
+          <div class="modal-body">
+            Title: <input type="text" class="form-control" id="event_title"></input>
+            Date: <input type="text" class="form-control" id="event_date" readonly></input>
+            Time: <input type="text" class="form-control" id="event_time"></input>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" id="add_event_btn">Submit</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal" id="cancel_event_btn">Close</button>
+          </div>
+        </div>
+
+      </div>
+    </div>	
+  </div>
+  
 
 <ul class="weekdays">
   <li>Sunday</li>
@@ -24,13 +51,16 @@
   <li>Saturday</li>
 </ul>
 <ul id="days"> </ul>
+<div id="list_event"></div>
 <!-- <form id="token_form" method="post" action="create_event.php">
   <input type="hidden" name="user_token" value="<?php session_start(); echo  $_SESSION['user_token'];  ?>"></input>
 </form> -->
+
 </body>
 <script type="text/javascript" src='test.js'>
 	console.log("printed out ttest.js");
 </script>
+<script type="text/javascript" src='event.js'></script>
 <script type="text/javascript">
 
 document.addEventListener("DOMContentLoaded", updateCalendar, false);
@@ -80,13 +110,15 @@ function updateCalendar(){
       li.id= "day"+num;
       ul.appendChild(li);
       $("#day"+num).data("dayObj", listOfDays[num]);
+      $("#days").children().attr('data-toggle', 'modal');
+      $("#days").children().attr('data-target', '#myModal');
 		}
 	}
 	console.log(listOfDays);
 	//to print month
 	var num_month = listOfDays[15].month;
-  	var year= listOfDays[15].year;
-   	printMonth(num_month,year);
+	var year= listOfDays[15].year;
+ 	printMonth(num_month,year);
     
    	//click day
    	document.getElementById("days").addEventListener("click",clickDay,false);
@@ -111,44 +143,65 @@ function printMonth(num_month,year) {
     document.getElementById("month_year").innerHTML = month[num_month]+", "+year;
 }
 
-function clickDay(e){
-  console.log(e.target.nodeName);
-    if(e.target && e.target.nodeName == "LI") {
-      alert(e.target.innerHTML);
-      clickbutton(e.target.innerHTML,e.target.id);
-    }
-}
-function clickbutton(day,id){
-  //console.log("clicked"+ day.getDate());
-  // alert("clicked"+ day.getDate()); // make a month and year
-  var title = prompt("What would you like to call this event");
-  var time = prompt("Please enter the time of event");
-  var category = prompt("Any event categories?");
-  createEvent(id, time, title, category);
-}
+// function clickDay(e){
+//   console.log(e.target.nodeName);
+//     if(e.target && e.target.nodeName == "LI") {
+//       alert(dayObj.date);
+//       clickbutton();
+//     }
+// }
+// function clickbutton(day,id){
+//   //console.log("clicked"+ day.getDate());
+//   // alert("clicked"+ day.getDate()); // make a month and year
+//   var title = prompt("What would you like to call this event");
+//   var time = prompt("Please enter the time of event");
+//   var category = prompt("Any event categories?");
+//   createEvent(id, time, title, category);
+// }
 
-function createEvent(date, time, title, category) {
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("POST", "create_event.php", true);
-  xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+// function createEvent(date, time, title, category) {
+//   var xmlHttp = new XMLHttpRequest();
+//   xmlHttp.open("POST", "create_event.php", true);
+//   xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   
-  xmlHttp.addEventListener("load", function(event){
-    var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
-    if(jsonData.success){  // in PHP, this was the "success" key in the associative array; in JavaScript, it's the .success property of jsonData
-      alert("success");
-    }else{
-      alert("fail");
-    }
-  }, false); // Bind the callback to the load event
-  xmlHttp.send("date=" + date + "&time=" + time + "&title=" + title + "&category=" + category);
-}
+//   xmlHttp.addEventListener("load", function(event){
+//     var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
+//     if(jsonData.success){  // in PHP, this was the "success" key in the associative array; in JavaScript, it's the .success property of jsonData
+//       alert("success");
+//     }else{
+//       alert("fail");
+//     }
+//   }, false); // Bind the callback to the load event
+//   xmlHttp.send("date=" + date + "&time=" + time + "&title=" + title + "&category=" + category);
+// }
+
+// function viewEvent(){
+//     $("#days").children('li').each(function(){
+//       // var dayid= this.id;
+//       var obj= $("#"+this.id);
+//       var dayObj = $("#"+this.id).data("dayObj");
+//       var dayid = dayObj.info;
+//       var dataString = "dayid=" + encodeURIComponent(dayid);
+     
+//       var xmlHttp = new XMLHttpRequest();
+//       xmlHttp.open("POST", "show_event.php", true); 
+//       xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      
+//       xmlHttp.addEventListener("load", function(event){
+//         var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
+//         if(jsonData.success){
+//           obj.append('<a>jsonData.ttile</a>');
+//         }
+//         else{
+         
+//         }
+//       }, false); // Bind the callback to the load event
+//       xmlHttp.send(dataString); // Send the data
+//     });
+// }
 
 function viewEvent(){
-    $("#days").children('li').each(function(){
-      var dayid= this.id;
-      var obj= $(this);
-      var dataString = "dayid=" + encodeURIComponent(dayid);
-     
+
       var xmlHttp = new XMLHttpRequest();
       xmlHttp.open("POST", "show_event.php", true); 
       xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -156,11 +209,13 @@ function viewEvent(){
       xmlHttp.addEventListener("load", function(event){
         var jsonData = JSON.parse(event.target.responseText); // parse the JSON into a JavaScript object
         if(jsonData.success){
-          obj.append('<a>'+jsonData.title+'</a>');
+            $("#list_event").append('<li>'+jsonData.output+jsonData.count+ '</li>');
+        }
+        else{
+         
         }
       }, false); // Bind the callback to the load event
-      xmlHttp.send(dataString); // Send the data
-    });
+      xmlHttp.send(null); // Send the data
 }
 
 </script>
