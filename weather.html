@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Weather Widget</title>
+	<link rel="stylesheet" type="text/css" href="weather.css">
+	<script type="text/javascript">
+		function fetchWeather(){
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.open("GET", "http://classes.engineering.wustl.edu/cse330/content/weather_json.php", true);
+			xmlHttp.addEventListener("load", ajaxCallback, false);
+			xmlHttp.send(null);
+
+			document.getElementById("btn").addEventListener("click",function(){
+			location.reload();
+			});
+		}
+		
+		function ajaxCallback(event){
+			var jsonData = JSON.parse(event.target.responseText);
+
+			var loc= document.getElementsByClassName("weather-loc");
+			var city= jsonData.location.city;
+			loc[0].innerHTML= city.bold()+" "+ jsonData.location.state;
+
+			var temp= document.getElementsByClassName("weather-temp");
+			temp[0].innerHTML= jsonData.current.temp;
+
+			var humidity= document.getElementsByClassName("weather-humidity");
+			humidity[0].innerHTML= jsonData.atmosphere.humidity;
+
+			var tmr= document.getElementsByClassName("weather-tomorrow");
+			tmr[0].src= 'http://us.yimg.com/i/us/nws/weather/gr/'+ jsonData.tomorrow.code+'ds.png';
+
+			var dayafter= document.getElementsByClassName("weather-dayaftertomorrow");
+			dayafter[0].src= 'http://us.yimg.com/i/us/nws/weather/gr/'+ jsonData.dayafter.code+'ds.png';
+		}
+		document.addEventListener("DOMContentLoaded", fetchWeather, false);
+
+	</script>
+</head>
+<body>
+	<div class="weather" id="weatherWidget">
+		<div class="weather-loc"></div>
+		<div class="weather-humidity"></div>
+		<div class="weather-temp"></div>
+		<img class="weather-tomorrow" alt="tmr-weather-pic" src="www.google.com"/>
+		<img class="weather-dayaftertomorrow" alt="dayafter-weather-pic" src="www.google.com"/>
+	</div>
+	<button id="btn">Refresh</button>
+</body>
+</html>
