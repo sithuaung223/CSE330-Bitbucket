@@ -1,0 +1,125 @@
+<html>
+   <head>
+      <style type="text/css">
+        #chat_log{
+         border: 1px solid #bbb;
+         width: 400px;
+         height: 300px;
+         overflow-y: scroll;
+         }
+      </style>
+      <script src="/socket.io/socket.io.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+      <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+      <script type ="text/javascript">
+$( document ).ready(function() {
+   $('#chat_room').hide();
+   $('#First_Chat').hide();
+});
+
+var username;
+var password;
+
+var socketio = io.connect();
+function login(){
+  if($('#username')!=''){
+    username= $('#username').value;
+    
+    $('#login_page').hide();
+    $('#First_Chat').show();
+    socketio.emit("login", {Usrname: Usrname});
+  }
+  else{
+    prompt("username is empty");
+  }
+}
+function sendMessage(){
+   var msg = document.getElementById("message_input").value;
+   socketio.emit("message_to_server", {message:msg});
+}
+
+function createChat(){
+  var Rname= prompt("Chatroom Name:");
+  var Rpass= prompt("Set password (for private rooms only):");
+  if (Rname ==''){
+    alert('Room is not created!');
+  }
+  else{
+    socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
+  }
+}
+
+ function joinChat(){
+  var Rname= prompt("Chatroom Name:");
+  if (Rname ==''){
+    alert('Room name is not added');
+  }
+  else{
+   socketio.emit("joining_chat", {username: username, Rname: Rname});
+  }
+}
+
+socketio.on("message_to_client",function(data) {
+  //Append an HR thematic break and the escaped HTML of the new message
+  document.getElementById("chatlog").appendChild(document.createElement("hr"));
+  document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
+});
+socketio.on("creating_chat",function(data) {
+    $('#chat_room').show();
+    $('#First_Chat').hide();
+    $('#login_page').hide();
+    $('#chat_name').html(data['Rname']);
+});
+
+socketio.on("joining_chat",function(data) {
+  //Append an HR thematic break and the escaped HTML of the new message
+  if(data['Rpass']==''){
+    //public chat
+    $('#chat_room').show();
+    $('#First_Chat').hide();
+    $('#login_page').hide();
+    $('#chat_name').html(data['Rname']);
+  }
+  else{
+    //private chat
+    var pass= prompt("Password");
+    if(pass!=data['Rpass']){
+      //not valid
+      alert('incorrect pass');
+      $('#chat_room').hide();
+      $('#First_Chat').show();
+      $('#login_page').hide();
+    }else{
+      //valid password
+      $('#chat_room').show();
+      $('#First_Chat').hide();
+      $('#login_page').hide();
+      $('#chat_name').html(data['Rname']);
+    }
+  }
+});
+
+</script>
+</head>
+<body>
+  <div id="login_page">
+    <p>Login Page</p><br>
+    Username: <input type="text" id="username"/>
+    <button onclick="login()" id="login_btn">Log in</button><br>
+  </div>
+
+  <div id="First_Chat">
+    <p>Welcome to Home Chat</p>
+    <button onclick="createChat()" id="create_chat">create</button><br>
+    <button onclick="joinChat()" id="join_chat">join</button><br><br>
+  </div>
+  
+  <div id="chat_room">
+    <h1 id="chat_name"></h1>  
+    <input type="text" id="message_input"/>
+        <button onclick="sendMessage()">send</button>
+    <div id="chatlog"></div>
+  </div>
+
+</body>
+</html>
