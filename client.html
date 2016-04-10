@@ -1,55 +1,63 @@
 <html>
-   <head>
-      <style type="text/css">
-        #chat_log{
-         border: 1px solid #bbb;
-         width: 400px;
-         height: 300px;
-         overflow-y: scroll;
-         }
-      </style>
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-      <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-      <script type ="text/javascript">
-$( document ).ready(function() {
+	<head>
+		<style type="text/css">
+			#chatlog{
+				border: 1px solid #bbb;
+				width: 400px;
+				height: 300px;
+				overflow-y: scroll;
+			}
+		</style>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+	<script type ="text/javascript">
+
+$(document).ready(function() {
    $('#chat_room').hide();
    $('#First_Chat').hide();
 });
 
 var username;
 var password;
+var curr_room;
+var room_list=[];
 
 var socketio = io.connect();
 function login(){
-  if($('#username')!=''){
-    username= $('#username').value;
-    
-    $('#login_page').hide();
-    $('#First_Chat').show();
-    socketio.emit("login", {Usrname: Usrname});
-  }
-  else{
-    prompt("username is empty");
-  }
+	if($('#username').val()!=''){
+		username= $('#username').val();
+		$('#login_page').hide();
+		$('#First_Chat').show();
+		socketio.emit("login", {user: username});
+	}
+	else{
+		prompt("username is empty");
+	}
 }
+
+function findUsers(){
+	user= prompt("Find User: ");
+	socketio.emit('find', {user: user});
+}
+
 function sendMessage(){
-   var msg = document.getElementById("message_input").value;
-   socketio.emit("message_to_server", {message:msg});
+	var msg = document.getElementById("message_input").value;
+	socketio.emit("message_to_server", {message:msg, user:username}, curr_room);
 }
 
 function createChat(){
-  var Rname= prompt("Chatroom Name:");
-  var Rpass= prompt("Set password (for private rooms only):");
-  if (Rname ==''){
-    alert('Room is not created!');
-  }
-  else{
-    socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
-  }
+	var Rname= prompt("Chatroom Name:");
+	var Rpass= prompt("Set password (for private rooms only):");
+	if (Rname ==''){
+		alert('Room is not created!');
+	}
+	else{
+		socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
+	}
 }
 
- function joinChat(){
+function joinChat(){
   var Rname= prompt("Chatroom Name:");
   if (Rname ==''){
     alert('Room name is not added');
@@ -58,27 +66,73 @@ function createChat(){
    socketio.emit("joining_chat", {username: username, Rname: Rname});
   }
 }
+function sendHome() {
+    $('#chat_room').hide();
+    $('#First_Chat').show();
+    $('#login_page').hide();
+}
 
 socketio.on("message_to_client",function(data) {
   //Append an HR thematic break and the escaped HTML of the new message
-  document.getElementById("chatlog").appendChild(document.createElement("hr"));
-  document.getElementById("chatlog").appendChild(document.createTextNode(data['message']));
+  if (data['message'] != '') {
+    var room_exist = false;
+    for(i in room_list){
+       if (room_list[i] == data['room']) {
+          room_exist= true;
+          $('#' + data['room']).append(data['user']+ ': '+ data['message']+ '<hr>');
+       }
+    }
+    if (!room_exist) {
+       room_list.push(data['room']);
+       $('#chatlog').append('<div id="'+data['room']+'" </div>');
+       $('#' + data['room']).append(data['user']+ ': '+ data['message']+ '<hr>');
+    }
+    // for(var i=0; i < room_list.lenght; i++){
+    //   if(room_list[i] != data['room']){
+    //     $('#'+room_list[i]).hide();
+    //   }
+    // }   
+ }
+ // if (data['message'] != '') {
+ //      document.getElementById("chatlog").appendChild(document.createTextNode(data['user']+ ": "+data['message']));
+ //    document.getElementById("chatlog").appendChild(document.createElement("hr"));
+ // }  
 });
 socketio.on("creating_chat",function(data) {
+    curr_room= data['Rname'];
     $('#chat_room').show();
     $('#First_Chat').hide();
     $('#login_page').hide();
     $('#chat_name').html(data['Rname']);
+
 });
 
-socketio.on("joining_chat",function(data) {
+socketio.on("user_found",function(data) {
+	if(data['found']){
+		alert("We have found your friend online");
+	}else{
+		alert("Your friend is not registered");
+	}
+});
+
+
+socketio.on("joining_chat",function(data,room) {
   //Append an HR thematic break and the escaped HTML of the new message
   if(data['Rpass']==''){
     //public chat
+    curr_room= data['Rname'];
     $('#chat_room').show();
+    // for(var i=0; i < room_list.lenght; i++){
+    //   if(room_list[i] != curr_room){
+    //     $('#'+room_list[i]).hide();
+    //   }
+    // }
     $('#First_Chat').hide();
     $('#login_page').hide();
+    $('#chat_name').empty();
     $('#chat_name').html(data['Rname']);
+    room.people.push(username);
+    $('#chat_name').append("<p>"+room.people+"</p>");
   }
   else{
     //private chat
@@ -91,10 +145,14 @@ socketio.on("joining_chat",function(data) {
       $('#login_page').hide();
     }else{
       //valid password
+      curr_room= data['Rname'];
       $('#chat_room').show();
       $('#First_Chat').hide();
       $('#login_page').hide();
+      $('#chat_name').empty();
       $('#chat_name').html(data['Rname']);
+      room.people.push(username);
+      $('#chat_name').append("<p>"+room.people+"</p>");
     }
   }
 });
@@ -110,14 +168,17 @@ socketio.on("joining_chat",function(data) {
 
   <div id="First_Chat">
     <p>Welcome to Home Chat</p>
-    <button onclick="createChat()" id="create_chat">create</button><br>
-    <button onclick="joinChat()" id="join_chat">join</button><br><br>
+	<button onclick="createChat()" id="create_chat">create</button><br>
+	<button onclick="joinChat()" id="join_chat">join</button><br>
+	<button id="find" onclick="findUsers()">Find a friend</button><br>
+
   </div>
   
   <div id="chat_room">
     <h1 id="chat_name"></h1>  
     <input type="text" id="message_input"/>
-        <button onclick="sendMessage()">send</button>
+     <button onclick="sendMessage()">send</button>
+     <button onclick="sendHome()">Go to Home</button>
     <div id="chatlog"></div>
   </div>
 
