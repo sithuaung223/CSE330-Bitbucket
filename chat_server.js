@@ -163,5 +163,4 @@ io.sockets.on("connection", function(socket){
 		socket_list[kicked].emit("kicked",room.name);
 
 	});
-
 });
