@@ -27,7 +27,7 @@ var io = socketio.listen(app);
 var public_room_list=[];
 var users=[];
 var private_room_list=[];
-
+var socket_list={};
 
 io.sockets.on("connection", function(socket){
 	// This callback runs when a new Socket.IO connection is established.
@@ -35,6 +35,8 @@ io.sockets.on("connection", function(socket){
 		socket.username= data['user'];
 		socket.room="room1";
 		socket.join('room1');
+		var name= data['user'];
+		socket_list[name]= socket;
 		// This callback runs when the server receives a new message from the client.
 		users.push(data['user']);
 		console.log('user lists:'+ users);
@@ -45,16 +47,17 @@ io.sockets.on("connection", function(socket){
 		socket.leave(socket.room);
 		socket.join(data['Rname']);
 		socket.room= data['Rname'];
+		var room;
 		if(data["Rpass"]==''){
-			var room = new chatRoom(data["Rname"]);
+			room = new chatRoom(data['admin'], data["Rname"]);
 			public_room_list.push(room);
 		}
 		else{
-			var room = new chatRoom(data['admin'], data["Rname"],data["Rpass"]);
+			room = new chatRoom(data['admin'], data["Rname"],data["Rpass"]);
 			private_room_list.push(room);
 		}
 		// io.clients[sessionID].emit("creating_chat"+data["username"],{Rpass: data["Rpass"]}) // broadcast the message to other users		
-		socket.emit("creating_chat",{Rname: data["Rname"]});
+		socket.emit("creating_chat",{Rname: data["Rname"]},room);
 	});
 
 	socket.on('find', function(data) {
@@ -71,6 +74,7 @@ io.sockets.on("connection", function(socket){
 	});
 	
 	socket.on('joining_chat', function(data) {
+
 		socket.leave(socket.room);
 		socket.join(data['Rname']);
 		socket.room= data['Rname'];
@@ -78,20 +82,37 @@ io.sockets.on("connection", function(socket){
 		for(var i=0; i < public_room_list.length; i++){
 			if(Jname == public_room_list[i].name){
 				// io.clients[sessionID].send("joining_chat"+data["username"],{Rname: public_room_list[i].name, Rpass: ''});
-				public_room_list[i].people.push(data['username']);
-				console.log("room_ppl: " +public_room_list[i].people);
-				socket.emit("joining_chat",{Rname: public_room_list[i].name, Rpass: ''},public_room_list[i]);
-				io.sockets.to(socket.room).emit("joining_chat",{Rname: public_room_list[i].name, Rpass: ''},public_room_list[i]);
+				var banned= public_room_list[i].banlist.indexOf(data['username']);
+				if( banned >= 0){
+					//banned user
+					console.log("User is in banned list"+ data['username']);
+					socket.emit("in_banlist", Jname);
+				}else{
+					//user is not in banlist
+					public_room_list[i].people.push(data['username']);
+					console.log("room_ppl: " +public_room_list[i].people);
+					socket.emit("joining_chat",{Rname: public_room_list[i].name, Rpass: ''},public_room_list[i]);
+					io.sockets.to(socket.room).emit("joining_chat",{Rname: public_room_list[i].name, Rpass: ''},public_room_list[i]);
+				}
+				
 			}
 		}
 		for(var i=0; i< private_room_list.length; i++){
 			if(Jname == private_room_list[i].name){
 				// io.clients[sessionID].send("joining_chat"+data["username"],{Rname: private_room_list[i].name, Rpass: private_room_list[i].pass});
-
-				private_room_list[i].people.push(data['username']);
-				console.log("room_ppl: " +private_room_list[i].people);
-				socket.emit("joining_chat",{Rname: private_room_list[i].name, Rpass: private_room_list[i].pass},private_room_list[i]);
-				io.sockets.to(socket.room).emit("joining_chat",{Rname: private_room_list[i].name, Rpass: ''},private_room_list[i]);
+				var banned = private_room_list[i].banlist.indexOf(data['username']);
+				if( banned >= 0){
+					//banned user
+					console.log("User is in banned list"+ data['username']);
+					socket.emit("in_banlist", Jname);
+				}
+				else{
+					//user is not in banlist
+					private_room_list[i].people.push(data['username']);
+					console.log("room_ppl: " +private_room_list[i].people);
+					socket.emit("joining_chat",{Rname: private_room_list[i].name, Rpass: private_room_list[i].pass},private_room_list[i]);
+					io.sockets.to(socket.room).emit("joining_chat",{Rname: private_room_list[i].name, Rpass: ''},private_room_list[i]);
+				}
 
 			}
 		}
@@ -103,6 +124,7 @@ io.sockets.on("connection", function(socket){
 		console.log("message: "+data["message"]); // log it to the Node.JS output
 		console.log("current room: "+ socket.room);
 		console.log("user: "+ data['user']);
+		console.log("current room: "+ io.sockets.to(socket.room));
 		io.sockets.to(socket.room).emit("message_to_client",{user: data['user'], message: data["message"], room: socket.room}); 
 	});
 
@@ -114,6 +136,32 @@ io.sockets.on("connection", function(socket){
 			fri: fri,
 			message: data['message']
 			},room);
+	});
+
+	socket.on('ban_user',function(banned, room){
+
+		for(var i=0; i < public_room_list.length; i++){
+			if(room.name == public_room_list[i].name){
+				// io.clients[sessionID].send("joining_chat"+data["username"],{Rname: public_room_list[i].name, Rpass: ''});
+				public_room_list[i].banlist.push(banned);
+				console.log("public banned list: " +public_room_list[i].banlist);
+				socket.emit("confirm_ban",{banlist: public_room_list[i].banlist});
+			}
+		}
+		for(var i=0; i< private_room_list.length; i++){
+			if(room.name == private_room_list[i].name){
+				// io.clients[sessionID].send("joining_chat"+data["username"],{Rname: private_room_list[i].name, Rpass: private_room_list[i].pass});
+				private_room_list[i].banlist.push(banned);
+				console.log("private banned list: " +private_room_list[i].banlist);
+				socket.emit("confirm_ban",{banlist: private_room_list[i].banlist});
+			}
+		}
+	});
+	socket.on('kick_user',function(kicked, room){
+		console.log("kick user:" + socket_list);
+		socket_list[kicked].leave(room.name);
+		socket_list[kicked].emit("kicked",room.name);
+
 	});
 
 });

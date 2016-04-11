@@ -1,17 +1,17 @@
 <html>
-	<head>
-		<style type="text/css">
-			#chatlog{
-				height: 400px;
-				width: 500px;
-				border: 1px solid #bbb;
-				overflow-y: scroll;
-			}
-		</style>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-	<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
-	<script type ="text/javascript">
+   <head>
+      <style type="text/css">
+         #chatlog{
+            height: 400px;
+            width: 500px;
+            border: 1px solid #bbb;
+            overflow-y: scroll;
+         }
+      </style>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+   <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+   <script type ="text/javascript">
 
 $(document).ready(function() {
    $('#chat_room').hide();
@@ -25,38 +25,38 @@ var room_list=[];
 
 var socketio = io.connect();
 function login(){
-	if($('#username').val()!=''){
-		username= $('#username').val();
-		$('#login_page').hide();
-		$('#First_Chat').show();
-		socketio.emit("login", {user: username});
+   if($('#username').val()!=''){
+      username= $('#username').val();
+      $('#login_page').hide();
+      $('#First_Chat').show();
+      socketio.emit("login", {user: username});
 
-	}
-	else{
-		prompt("username is empty");
-	}
+   }
+   else{
+      prompt("username is empty");
+   }
 }
 
 function findUsers(){
-	user= prompt("Find User: ");
-	socketio.emit('find', {user: user});
+   user= prompt("Find User: ");
+   socketio.emit('find', {user: user});
 }
 
 function sendMessage(){
-	var msg = document.getElementById("message_input").value;
-	socketio.emit("message_to_server", {message:msg, user:username});
+   var msg = document.getElementById("message_input").value;
+   socketio.emit("message_to_server", {message:msg, user:username});
 }
 
 function createChat(){
-	var Rname= prompt("Chatroom Name:");
-	var Rpass= prompt("Set password (for private rooms only):");
-	if (Rname ==''){
-		alert('Room is not created!');
-	}
-	else{
-		//create socket here
-		socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
-	}
+   var Rname= prompt("Chatroom Name:");
+   var Rpass= prompt("Set password (for private rooms only):");
+   if (Rname ==''){
+      alert('Room is not created!');
+   }
+   else{
+      //create socket here
+      socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
+   }
 }
 
 function joinChat(){
@@ -74,11 +74,18 @@ function sendHome() {
     $('#login_page').hide();
 }
 function sendpMessage(){
-	fri = prompt("Message to whom: ");
-	msg = prompt("Your Message: ");
-	socketio.emit("private_message", fri, {message: msg, user: username}, curr_room); 
+   fri = prompt("Message to whom: ");
+   msg = prompt("Your Message: ");
+   socketio.emit("private_message", fri, {message: msg, user: username}, curr_room); 
 }
-
+function banUser(){
+   var banned= prompt("User to be banned:");
+   socketio.emit("ban_user", banned, curr_room);
+}
+function kickUser(){
+   var kicked= prompt("User to be kicked:");
+   socketio.emit("kick_user", kicked, curr_room);
+}
 socketio.on("message_to_client",function(data) {
   //Append an HR thematic break and the escaped HTML of the new message
   if (data['message'] != '') {
@@ -96,7 +103,8 @@ socketio.on("message_to_client",function(data) {
     }  
  } 
 });
-socketio.on("creating_chat",function(data) {
+socketio.on("creating_chat",function(data, room) {
+   curr_room= room;
     $('#chat_room').show();
     $('#First_Chat').hide();
     $('#login_page').hide();
@@ -105,78 +113,102 @@ socketio.on("creating_chat",function(data) {
 });
 
 socketio.on("user_found",function(data) {
-	if(data['found']){
-		alert("We have found your friend online");
-	}else{
-		alert("Your friend is not registered");
-	}
+   if(data['found']){
+      alert("We have found your friend online");
+   }else{
+      alert("Your friend is not registered");
+   }
 });
 
 socketio.on("pMessage_to_friend",function(data,room){
-	for(var i = 0; i < room.people.length; i++){
-		if(data['fri'] == room.people[i]){
-			if(data['fri'] == username){
-				alert(data['me']+" says: "+ data['message']);
-			}
-		}         
-	} 
+   for(var i = 0; i < room.people.length; i++){
+      if(data['fri'] == room.people[i]){
+         if(data['fri'] == username){
+            alert(data['me']+" says: "+ data['message']);
+         }
+      }         
+   } 
+});
+
+socketio.on("confirm_ban", function(data){
+   alert("You have banned :"+ data['banlist']);
+});
+
+socketio.on("in_banlist", function(room){
+   alert("You have been banned from "+ room);
+});
+
+socketio.on("kicked", function(room){
+   alert("You have been kicked from "+ room);
+   $('#chat_room').hide();
+   $('#First_Chat').show();
 });
 
 socketio.on("joining_chat",function(data,room) {
-	if(data['Rpass']==''){  //public chat
-		curr_room= room;
-		$('#chat_room').show();
-		$('#First_Chat').hide();
-		$('#login_page').hide();
-		$('#chat_name').empty();
-		$('#chat_name').html(data['Rname']);
-		$('#chat_mem').empty();
-		$('#chat_mem').append("<p>"+room.people+"</p>");
-	}else{ //private chat
-		var pass= prompt("Password");
-		if(pass!=data['Rpass']){ //not valid
-			alert('incorrect pass');
-			$('#chat_room').hide();
-			$('#First_Chat').show();
-			$('#login_page').hide();
-		}else{ //valid password
-			curr_room= room;
-			$('#chat_room').show();
-			$('#First_Chat').hide();
-			$('#login_page').hide();
-			$('#chat_name').empty();
-			$('#chat_name').html(data['Rname']);
-			$('#chat_mem').empty();
-			$('#chat_mem').append("<p>"+room.people+"</p>");
-		}
-	}
+   if(data['Rpass']==''){  //public chat
+      curr_room= room;
+      if(username != room.admin){
+         $('#ban_btn').hide();
+         $('#kick_btn').hide();
+      }
+      $('#chat_room').show();
+      $('#First_Chat').hide();
+      $('#login_page').hide();
+      $('#chat_name').empty();
+      $('#chat_name').html(data['Rname']);
+      $('#chat_mem').empty();
+      $('#chat_mem').append("<p>"+room.people+"</p>");
+   }else{ //private chat
+      var pass= prompt("Password");
+      if(pass!=data['Rpass']){ //not valid
+         alert('incorrect pass');
+         $('#chat_room').hide();
+         $('#First_Chat').show();
+         $('#login_page').hide();
+      }else{ //valid password
+         curr_room= room;
+         if(username != room.admin){
+            $('#ban_btn').hide();
+            $('#kick_btn').hide();
+         }
+         $('#chat_room').show();
+         $('#First_Chat').hide();
+         $('#login_page').hide();
+         $('#chat_name').empty();
+         $('#chat_name').html(data['Rname']);
+         $('#chat_mem').empty();
+         $('#chat_mem').append("<p>"+room.people+"</p>");
+      }
+   }
 });
 
 </script>
 </head>
 <body>
-	<div id="login_page">
-		<p>Login Page</p><br>
-		Username: <input type="text" id="username"/>
-		<button onclick="login()" id="login_btn">Log in</button><br>
-	</div>
+   <div id="login_page">
+      <p>Login Page</p><br>
+      Username: <input type="text" id="username"/>
+      <button onclick="login()" id="login_btn">Log in</button><br>
+   </div>
 
-	<div id="First_Chat">
-		<p>Welcome to Home Chat</p>
-		<button onclick="createChat()" id="create_chat">create</button><br>
-		<button onclick="joinChat()" id="join_chat">join</button><br>
-		<button id="find" onclick="findUsers()">Find a friend</button><br>
-	</div>
+   <div id="First_Chat">
+      <p>Welcome to Home Chat</p>
+      <button onclick="createChat()" id="create_chat">create</button><br>
+      <button onclick="joinChat()" id="join_chat">join</button><br>
+      <button id="find" onclick="findUsers()">Find a friend</button><br>
+   </div>
   
-	<div id="chat_room">
-		<h1 id = "chat_name"></h1><br>
-		<h2 id = "chat_mem"></h2>
-		<input type="text" id="message_input"/>
-		<button onclick="sendMessage()">send</button>
-		<button onclick="sendHome()">Go to Home</button>
-		<button onclick="sendpMessage()">Send a Private Message</button>
-		<div id="chatlog"></div>
-	</div>
+   <div id="chat_room">
+      <h1 id = "chat_name"></h1><br>
+      <h2 id = "chat_mem"></h2>
+      <input type="text" id="message_input"/>
+      <button onclick="sendMessage()">send</button>
+      <button onclick="sendHome()">Go to Home</button>
+      <button onclick="sendpMessage()">Send a Private Message</button>
+      <button onclick="banUser()" id="ban_btn">Ban User</button>
+      <button onclick="kickUser()" id="kick_btn">Kick User</button>
+      <div id="chatlog"></div>
+   </div>
 
 </body>
 </html>
