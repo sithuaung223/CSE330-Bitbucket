@@ -1,13 +1,23 @@
-<html>
-   <head>
-      <style type="text/css">
-         #chatlog{
-            height: 400px;
-            width: 500px;
-            border: 1px solid #bbb;
-            overflow-y: scroll;
-         }
-      </style>
+<!DOCTYPE html>
+	<head>
+		<meta charset="UTF-8">
+		<title>CSE 330 SECRET CHAT</title>
+		<style type="text/css">
+			h1 {text-align: center;
+				color: green;
+				font-style: Arial;
+				size: 40}
+			h2 {text-align: left;
+				color: 	#004d66;
+				size: 28}
+			#chatlog{
+				height: 400px;
+				width: 500px;
+				border: 1px solid #004d66;
+				overflow-y: scroll;
+				}
+			#Chatroom.background #004d66
+		</style>
    <script src="/socket.io/socket.io.js"></script>
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
@@ -186,13 +196,13 @@ socketio.on("joining_chat",function(data,room) {
 </head>
 <body>
    <div id="login_page">
-      <p>Login Page</p><br>
-      Username: <input type="text" id="username"/>
+      <h1>Login Page</h1>
+      <h2>Username: </h2><input type="text" id="username"/>
       <button onclick="login()" id="login_btn">Log in</button><br>
    </div>
 
    <div id="First_Chat">
-      <p>Welcome to Home Chat</p>
+      <h1>Welcome to 330's Chatboard</h1>
       <button onclick="createChat()" id="create_chat">create</button><br>
       <button onclick="joinChat()" id="join_chat">join</button><br>
       <button id="find" onclick="findUsers()">Find a friend</button><br>
