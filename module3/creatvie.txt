@@ -1,0 +1,15 @@
+Amir Raheem 437677
+Si Thu Aung 444971
+
+Login Page: 
+http://ec2-54-174-37-57.compute-1.amazonaws.com/~sithuaung/home.php
+Main page:
+http://ec2-54-174-37-57.compute-1.amazonaws.com/~sithuaung/main.php
+
+Username:asdf
+Password:asdf
+
+Username:sithuaung
+Password:hello
+
+You can upload image url to the website and it will show it in the post. We have edited the size function so that it will also show up with a certian size. We have also included upvotes on posts, so that other users can see how popular other posts are. We also styled the website so make it more appealing. Also if you are not the post owner, you will not see the edit or delete button so they will not be able to edit. This is also true for the comments.

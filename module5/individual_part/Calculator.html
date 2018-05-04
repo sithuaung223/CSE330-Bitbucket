@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Calculator</title>
+	<meta charset="UTF-8">
+	
+</head>
+<body>
+	
+	First num: <input type="text" id="first_num"> <br>
+	Second num: <input type="text" id="second_num"> <br>
+
+	<input type="radio" name="op" value="Add"> Add<br>
+	<input type="radio" name="op" value="Sub"> Substraction<br>
+	<input type="radio" name="op" value="Mul"> Multiplication<br>
+	<input type="radio" name="op" value="Div"> Division<br>
+
+	<!-- <input type="button" id="calculate" value="Calculate"> <br> -->
+	<p id="p"> Answer: </p>
+	<script type="text/javascript">
+		
+		// get all radios button
+		var op= document.getElementsByName("op");
+		
+		// Add listeners to all radio buttons
+		for (i=0; i< op.length; i++){
+			op[i].addEventListener('click', Operation, false);
+		}
+
+		// function for operation: Add, Sub, Mul, Div
+		function Operation(){
+			
+			var x= +document.getElementById("first_num").value;
+			var y= +document.getElementById("second_num").value;
+			var op= document.getElementsByName("operation").value;
+			var ans;
+			
+			switch(this.value){
+				case "Add":
+					ans= x + y;
+					break;	
+				case "Sub":
+					ans= x - y;
+					break;
+				case "Mul":
+					ans= x * y;
+					break;
+				case "Div":
+					if(y==0){
+						ans= "cannot divided by zero";
+						break;
+					}
+					ans= x / y;
+					break;					
+			}
+
+			// display the answer 
+			var p= document.getElementById("p");
+			var answer= "Answer: " + ans;
+			p.innerHTML = answer;
+		}
+	</script>
+
+</body>
+
+</html>
