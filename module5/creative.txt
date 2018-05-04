@@ -1,0 +1,14 @@
+Amir Raheem 437677
+Si Thu Aung 444971
+
+Login Page: 
+http://ec2-54-174-37-57.compute-1.amazonaws.com/~sithuaung/module5/grp/user/calendar.html
+
+Username:User1
+Password:123
+
+There are 4 parts to the creative portion:
+1. We implemented a highlight feature over the dates so you can see where you are clicking beforehand. We also used a color schemes for it to look aesthetically pleasing.
+2. We used Bootstrap to get some cool buttons for the login page, as well as to select the prev/next month.
+3. We allowed the events to be viewed, not only in the calender, but also below the calender as well. This allows for a quick list viewing of the days ahead.
+4. We created a year skipping function, where it is possible to jump to other years. It even keeps the month you were using before, for annual events.
