@@ -1,0 +1,19 @@
+<table class="table"ng-controller="CoffeeListCtrl">
+  Search: <input class="form-control" ng-model="query">
+  <thead>
+    <tr >
+      <th>Reviews:</th>
+      <th>Brand:</th>
+      <th>Coffee Title:</th>
+      <th>Country:</th>
+    </tr>
+  <thead>
+  <tr class="success" ng-repeat="coffee in coffees | filter:query">
+    <td><a  href="#/reviews/{{coffee.id}}">reviews</a></td>
+    <td>{{coffee.brand}}</td>
+    <td>{{coffee.name}}</td>
+    <td>{{coffee.country}}</td>
+  </tr>
+</table>
+<img src="http://www.innovativeos.com/wp-content/uploads/2015/11/diff-types-coffee.jpg" alt="coffee">
+

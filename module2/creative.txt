@@ -1,0 +1,18 @@
+Amir Raheem 437677
+Si Thu Aung 444971
+
+Login Page:
+http://ec2-54-174-37-57.compute-1.amazonaws.com/~sithuaung/module2_grp/file_sharing.php
+
+Usernames:
+sithuaung
+araheem
+rock
+
+Profile Page:
+http://ec2-54-174-37-57.compute-1.amazonaws.com/~sithuaung/module2_grp/profile.php
+
+Creative Portion:
+We styled our Web Page with css using lines to seperate the uploads and file list as well as an attractive background colour. Once you log in, it shows the name of the logged in user at the top. When you upload a file, it instantly uploads it and you are not redirected to another page to see the upload. If the user logs out, it will direct them back to "login page" with a notice telling them they logged out.
+
+Login with one of the usernames above to go to the profile page..
