@@ -1,0 +1,5 @@
+Name- Si Thu Aung
+
+1. \bhello world\b
+2. \w*[aeiou]{3}\w*
+3. ^[A-Z]{2}\d{3,4}$
