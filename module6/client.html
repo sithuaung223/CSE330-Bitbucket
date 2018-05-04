@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+	<head>
+		<meta charset="UTF-8">
+		<title>CSE 330 SECRET CHAT</title>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+			<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<style type="text/css">
+			h1 {text-align: center;
+				color: green;
+				font-style: Arial;
+				size: 40}
+			h2 {text-align: left;
+				color: 	#004d66;
+				size: 28}
+			#chatlog{
+				height: 400px;
+				width: 500px;
+				border: 1px solid #004d66;
+				overflow-y: scroll;
+				}
+			#Chatroom.background #004d66
+		</style>
+   <script src="/socket.io/socket.io.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+   <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+   <script type ="text/javascript">
+
+$(document).ready(function() {
+   $('#chat_room').hide();
+   $('#First_Chat').hide();
+});
+
+var username;
+var password;
+var curr_room;
+var room_list=[];
+
+var socketio = io.connect();
+function login(){
+   if($('#username').val()!=''){
+      username= $('#username').val();
+      $('#login_page').hide();
+      $('#First_Chat').show();
+      socketio.emit("login", {user: username});
+
+   }
+   else{
+      prompt("username is empty");
+   }
+}
+
+function findUsers(){
+   user= prompt("Find User: ");
+   socketio.emit('find', {user: user});
+}
+
+function sendMessage(){
+   var msg = document.getElementById("message_input").value;
+   socketio.emit("message_to_server", {message:msg, user:username});
+}
+
+function createChat(){
+   var Rname= prompt("Chatroom Name:");
+   var Rpass= prompt("Set password (for private rooms only):");
+   if (Rname ==''){
+      alert('Room is not created!');
+   }
+   else{
+      //create socket here
+      socketio.emit("creating_chat", {username: username, admin: username, Rname: Rname, Rpass: Rpass});
+   }
+}
+
+function joinChat(){
+  var Rname= prompt("Chatroom Name:");
+  if (Rname ==''){
+    alert('Room name is not added');
+  }
+  else{
+   socketio.emit("joining_chat", {username: username, Rname: Rname});
+  }
+}
+function sendHome() {
+    $('#chat_room').hide();
+    $('#First_Chat').show();
+    $('#login_page').hide();
+}
+function sendpMessage(){
+   fri = prompt("Message to whom: ");
+   msg = prompt("Your Message: ");
+   socketio.emit("private_message", fri, {message: msg, user: username}, curr_room); 
+}
+function banUser(){
+   var banned= prompt("User to be banned:");
+   socketio.emit("ban_user", banned, curr_room);
+}
+function kickUser(){
+   var kicked= prompt("User to be kicked:");
+   socketio.emit("kick_user", kicked, curr_room);
+}
+socketio.on("message_to_client",function(data) {
+  //Append an HR thematic break and the escaped HTML of the new message
+  if (data['message'] != '') {
+    var room_exist = false;
+    for(i in room_list){
+       if (room_list[i] == data['room']) {
+          room_exist= true;
+          $('#' + data['room']).append(data['user']+ ': '+ data['message']+ '<hr>');
+       }
+    }
+    if (!room_exist) {
+       room_list.push(data['room']);
+       $('#chatlog').append('<div id="'+data['room']+'" </div>');
+       $('#' + data['room']).append(data['user']+ ': '+ data['message']+ '<hr>');
+    }  
+ } 
+});
+socketio.on("creating_chat",function(data, room) {
+   curr_room= room;
+    $('#chat_room').show();
+    $('#First_Chat').hide();
+    $('#login_page').hide();
+    $('#chat_name').html(data['Rname']);
+
+});
+
+socketio.on("user_found",function(data) {
+   if(data['found']){
+      alert("We have found your friend online");
+   }else{
+      alert("Your friend is not registered");
+   }
+});
+
+socketio.on("pMessage_to_friend",function(data,room){
+   for(var i = 0; i < room.people.length; i++){
+      if(data['fri'] == room.people[i]){
+         if(data['fri'] == username){
+            alert(data['me']+" says: "+ data['message']);
+         }
+      }         
+   } 
+});
+
+socketio.on("confirm_ban", function(data){
+   alert("You have banned :"+ data['banlist']);
+});
+
+socketio.on("in_banlist", function(room){
+   alert("You have been banned from "+ room);
+});
+
+socketio.on("kicked", function(room){
+   alert("You have been kicked from "+ room);
+   $('#chat_room').hide();
+   $('#First_Chat').show();
+});
+
+socketio.on("joining_chat",function(data,room) {
+   if(data['Rpass']==''){  //public chat
+      curr_room= room;
+      if(username != room.admin){
+         $('#ban_btn').hide();
+         $('#kick_btn').hide();
+      }
+      $('#chat_room').show();
+      $('#First_Chat').hide();
+      $('#login_page').hide();
+      $('#chat_name').empty();
+      $('#chat_name').html(data['Rname']);
+      $('#chat_mem').empty();
+      $('#chat_mem').append("<p>"+room.people+"</p>");
+   }else{ //private chat
+      var pass= prompt("Password");
+      if(pass!=data['Rpass']){ //not valid
+         alert('incorrect pass');
+         $('#chat_room').hide();
+         $('#First_Chat').show();
+         $('#login_page').hide();
+      }else{ //valid password
+         curr_room= room;
+         if(username != room.admin){
+            $('#ban_btn').hide();
+            $('#kick_btn').hide();
+         }
+         $('#chat_room').show();
+         $('#First_Chat').hide();
+         $('#login_page').hide();
+         $('#chat_name').empty();
+         $('#chat_name').html(data['Rname']);
+         $('#chat_mem').empty();
+         $('#chat_mem').append("<p>"+room.people+"</p>");
+      }
+   }
+});
+
+</script>
+</head>
+<body>
+   <div id="login_page">
+      <h1>Login Page</h1>
+      <h2>Username: </h2><input type="text" id="username"/>
+      <button onclick="login()" id="login_btn" class="btn btn-success">Log in</button><br>
+   </div>
+
+   <div id="First_Chat">
+      <h1>Welcome to 330's Chatboard</h1>
+      <button onclick="createChat()" id="create_chat" class="btn btn-danger">create</button>
+      <button onclick="joinChat()" id="join_chat" class="btn btn-success">join</button>
+      <button id="find" onclick="findUsers()" class="btn btn-warning">Find a friend</button>
+   </div>
+  
+   <div id="chat_room">
+      <h1 id = "chat_name">Welcome to </h1><br>
+      <h2 id = "chat_mem">Members:</h2>
+      <input type="text" id="message_input"/>
+      <button onclick="sendMessage()" class="btn btn-success">send</button>
+      <button onclick="sendHome()" class="btn btn-info">Go to Home</button>
+      <button onclick="sendpMessage()" class="btn btn-success">Send a Private Message</button>
+      <button onclick="banUser()" class="btn btn-danger" id="ban_btn">Ban User</button>
+      <button onclick="kickUser()" class="btn btn-danger" id="kick_btn">Kick User</button>
+      <div id="chatlog"></div>
+   </div>
+
+</body>
+</html>
